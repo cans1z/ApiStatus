@@ -30,7 +30,7 @@
   apistatus:
     image: apistatus
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: apistatus_api
     ports:
