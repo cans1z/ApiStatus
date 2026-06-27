@@ -9,18 +9,18 @@ namespace ApiStatus.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly AppDbContext _context;
+    private readonly AppDbContext _db;
     private readonly ITokenService _tokenService;
 
-    public AuthService(AppDbContext context, ITokenService tokenService)
+    public AuthService(AppDbContext db, ITokenService tokenService)
     {
-        _context = context;
+        _db = db;
         _tokenService = tokenService;
     }
     
     public async Task Register(RegisterDto dto)
     {
-        var userExists = await _context.Users
+        var userExists = await _db.Users
             .AnyAsync(u => u.Email.ToLower() == dto.Email.ToLower());
 
         if (userExists)
@@ -37,14 +37,14 @@ public class AuthService : IAuthService
             CreatedAt = DateTime.UtcNow
         };
         
-        await _context.Users.AddAsync(newUser);
-        await _context.SaveChangesAsync();
+        await _db.Users.AddAsync(newUser);
+        await _db.SaveChangesAsync();
         
     }
 
     public async Task<string> Login(LoginDto dto)
     {
-        var user = await _context.Users
+        var user = await _db.Users
             .FirstOrDefaultAsync(u => u.Email == dto.Email);
         
         if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
